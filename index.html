@@ -1,29 +1,20 @@
-<!DOCTYPE html><html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conilon Stock Pro - 61kg</title>
-
-    <!-- Meta tags PWA -->
+    <title>Conilon Stock Pro - 60kg</title>
     <meta name="theme-color" content="#a17a5e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Conilon Pro">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="Sistema de controle de estoque de café Conilon">
-
-    <!-- Ícones e Manifest -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
-
-    <!-- Tailwind CSS (versão específica para evitar aviso) -->
     <script src="https://cdn.tailwindcss.com/3.4.1"></script>
-    
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Configuração do Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -43,12 +34,13 @@
             }
         }
     </script>
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #000000; }
+        
         .sidebar-item { transition: all 0.2s ease-in-out; }
         .sidebar-item.active { background-color: #1d1714; border-right: 4px solid #a17a5e; color: #e6dfda; }
+        
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
@@ -74,50 +66,157 @@
             font-family: inherit;
         }
         #install-btn:hover { background: #e6dfda; }
+
+        #toggle-sidebar {
+            position: absolute;
+            top: 20px;
+            right: -14px;
+            width: 28px;
+            height: 28px;
+            background: #a17a5e;
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            z-index: 60;
+            transition: transform 0.3s ease, background 0.2s;
+        }
+        #toggle-sidebar:hover { background: #e6dfda; }
+        #toggle-sidebar i { transition: transform 0.3s ease; font-size: 11px; }
+
+        aside {
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        aside.collapsed {
+            width: 72px !important;
+        }
+
+        aside.collapsed .sidebar-text,
+        aside.collapsed .header-text,
+        aside.collapsed .config-section {
+            display: none;
+        }
+
+        aside.collapsed .sidebar-item {
+            justify-content: center;
+            padding: 14px 0;
+            gap: 0;
+        }
+
+        aside.collapsed .sidebar-item i {
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        aside.collapsed .sidebar-item.active {
+            border-right: none;
+            border-left: 4px solid #a17a5e;
+        }
+
+        aside.collapsed .header-logo {
+            justify-content: center;
+            padding: 20px 0;
+            gap: 0;
+        }
+
+        aside.collapsed #toggle-sidebar i {
+            transform: rotate(180deg);
+        }
+
+        .sidebar-text {
+            transition: opacity 0.2s ease;
+        }
+
+        @media (max-width: 768px) {
+            aside {
+                position: fixed;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                z-index: 50;
+            }
+            aside.collapsed {
+                width: 72px !important;
+            }
+            main {
+                margin-left: 72px;
+                transition: margin-left 0.3s ease;
+            }
+            body.sidebar-expanded main {
+                margin-left: 256px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            main {
+                transition: margin-left 0.3s ease;
+            }
+            body.sidebar-expanded main {
+                margin-left: 256px;
+            }
+            body:not(.sidebar-expanded) main {
+                margin-left: 72px;
+            }
+        }
     </style>
 </head>
 <body class="text-brandText flex h-screen overflow-hidden bg-brandBg">
 
-    <aside class="w-64 bg-brandSurface text-brandTextSecondary flex flex-col border-r border-brandBorder z-50">
-        <div class="p-6 flex items-center gap-3 border-b border-brandBorder">
+    <aside id="sidebar" class="w-64 bg-brandSurface text-brandTextSecondary flex flex-col border-r border-brandBorder z-50">
+        <button id="toggle-sidebar" onclick="toggleSidebar()" aria-label="Alternar sidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <div class="header-logo p-6 flex items-center gap-3 border-b border-brandBorder">
             <i class="fas fa-seedling text-brandAccent text-2xl"></i>
-            <h1 class="text-lg font-bold tracking-tight text-brandText">Conilon Pro</h1>
+            <h1 class="header-text text-lg font-bold tracking-tight text-brandText">Conilon Pro</h1>
         </div>
 
         <nav class="flex-grow py-6">
             <ul class="space-y-1">
                 <li>
-                    <button onclick="showTab('tab-dashboard')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-dashboard">
-                        <i class="fas fa-chart-line w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Dashboard
+                    <button onclick="showTab('tab-dashboard')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-dashboard" title="Dashboard">
+                        <i class="fas fa-chart-line w-5 transition-transform duration-200 group-hover:translate-x-1"></i>
+                        <span class="sidebar-text">Dashboard</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="showTab('tab-add')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-add">
-                        <i class="fas fa-plus-circle w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Adicionar
+                    <button onclick="showTab('tab-add')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-add" title="Adicionar">
+                        <i class="fas fa-plus-circle w-5 transition-transform duration-200 group-hover:translate-x-1"></i>
+                        <span class="sidebar-text">Adicionar</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="showTab('tab-harvests')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-harvests">
-                        <i class="fas fa-seedling w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Colheitas
+                    <button onclick="showTab('tab-harvests')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-harvests" title="Colheitas">
+                        <i class="fas fa-seedling w-5 transition-transform duration-200 group-hover:translate-x-1"></i>
+                        <span class="sidebar-text">Colheitas</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="showTab('tab-history')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-history">
-                        <i class="fas fa-history w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Histórico
+                    <button onclick="showTab('tab-history')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-history" title="Histórico">
+                        <i class="fas fa-history w-5 transition-transform duration-200 group-hover:translate-x-1"></i>
+                        <span class="sidebar-text">Histórico</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="showTab('tab-backup')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-backup">
-                        <i class="fas fa-database w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Backup
+                    <button onclick="showTab('tab-backup')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-backup" title="Backup">
+                        <i class="fas fa-database w-5 transition-transform duration-200 group-hover:translate-x-1"></i>
+                        <span class="sidebar-text">Backup</span>
                     </button>
                 </li>
             </ul>
         </nav>
 
-        <div class="p-4 text-[10px] text-center text-brandTextMuted border-t border-brandBorder bg-brandBg/30">
+        <div class="config-section p-4 text-[10px] text-center text-brandTextMuted border-t border-brandBorder bg-brandBg/30">
             <div class="flex items-center justify-center gap-2">
-                <span>Saca padrão:</span>
-                <input type="number" id="config-saca-kg" value="61" class="bg-transparent w-10 text-center border-b border-brandBorder focus:border-brandAccent outline-none font-bold text-brandText transition-all" onchange="updateSacaWeight(this.value)">
+                <span>Saca:</span>
+                <input type="number" id="config-saca-kg" value="61" class="bg-transparent w-12 text-center border-b border-brandBorder focus:border-brandAccent outline-none font-bold text-brandText transition-all" onchange="updateSacaWeight(this.value)">
                 <span>kg</span>
             </div>
         </div>
@@ -288,9 +387,6 @@
 
     </main>
 
-    <!-- ============================================= -->
-    <!-- 🆕 BOTÃO INSTALAR APP (NOVO) -->
-    <!-- ============================================= -->
     <button id="install-btn">
         <i class="fas fa-download mr-2"></i> Instalar App
     </button>
@@ -334,6 +430,12 @@
             document.getElementById(tabId).classList.add('active');
             const btnId = 'btn-' + tabId.replace('tab-', '');
             if(document.getElementById(btnId)) document.getElementById(btnId).classList.add('active');
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (!sidebar.classList.contains('collapsed')) {
+                    toggleSidebar();
+                }
+            }
         }
 
         const formatWeight = (totalKg) => {
@@ -603,25 +705,59 @@
 
         const renderUndoList = () => {};
 
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const body = document.body;
+            sidebar.classList.toggle('collapsed');
+            body.classList.toggle('sidebar-expanded');
+            const isExpanded = !sidebar.classList.contains('collapsed');
+            localStorage.setItem('conilon_sidebar_state', isExpanded ? 'expanded' : 'collapsed');
+        }
+
+        function initSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const body = document.body;
+            const savedState = localStorage.getItem('conilon_sidebar_state');
+            
+            if (savedState === 'expanded') {
+                sidebar.classList.remove('collapsed');
+                body.classList.add('sidebar-expanded');
+            } else if (savedState === 'collapsed') {
+                sidebar.classList.add('collapsed');
+                body.classList.remove('sidebar-expanded');
+            } else {
+                if (window.innerWidth < 768) {
+                    sidebar.classList.add('collapsed');
+                    body.classList.remove('sidebar-expanded');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    body.classList.add('sidebar-expanded');
+                }
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth < 768 && !sidebar.classList.contains('collapsed')) {
+                sidebar.classList.add('collapsed');
+                document.body.classList.remove('sidebar-expanded');
+            }
+        });
+
         document.getElementById('entry-year').value = new Date().getFullYear();
         document.getElementById('harvest-year').value = new Date().getFullYear();
+        initSidebar();
         showTab('tab-dashboard');
         render();
 
-        // =============================================
-        // 🆕 REGISTRO DO SERVICE WORKER (NOVO)
-        // =============================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('✅ SW registrado:', reg.scope))
-                    .catch(err => console.error('❌ Falha no SW:', err));
+                    .then(reg => console.log('SW registrado:', reg.scope))
+                    .catch(err => console.error('Falha no SW:', err));
             });
         }
 
-        // =============================================
-        // 🆕 BOTÃO INSTALAR APP (NOVO)
-        // =============================================
         let deferredPrompt;
         const installBtn = document.getElementById('install-btn');
 
@@ -645,11 +781,6 @@
             deferredPrompt = null;
         });
 
-        // =============================================
-        //  SCRIPT DE ATALHOS (SHORTCUTS)
-        // =============================================
-        // Detecta se a URL termina com #add ou #harvests (usado pelos atalhos do PWA)
-        // e abre a aba correspondente automaticamente.
         window.addEventListener('load', () => {
             const hash = window.location.hash.replace('#', '');
             if (hash === 'add') {
@@ -659,7 +790,6 @@
             }
         });
 
-        // Atualiza a aba se o usuário mudar o hash manualmente
         window.addEventListener('hashchange', () => {
             const hash = window.location.hash.replace('#', '');
             if (hash === 'add') {
