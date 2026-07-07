@@ -1,0 +1,656 @@
+<!DOCTYPE html><html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conilon Stock Pro - 61kg</title>
+
+    <!-- ============================================= -->
+    <!-- 🆕 META TAGS PWA (NOVAS) -->
+    <!-- ============================================= -->
+    <meta name="theme-color" content="#a17a5e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Conilon Pro">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="Sistema de controle de estoque de café Conilon">
+
+    <!-- ============================================= -->
+    <!-- 🆕 ÍCONES E MANIFEST (NOVOS) -->
+    <!-- ============================================= -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandBg: '#000000',
+                        brandSurface: '#120e0c',
+                        brandSurfaceHover: '#1d1714',
+                        brandAccent: '#a17a5e',
+                        brandAccentMuted: '#6e523e',
+                        brandText: '#e6dfda',
+                        brandTextSecondary: '#8c8078',
+                        brandTextMuted: '#544a44',
+                        brandBorder: '#231b18'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #000000; }
+        .sidebar-item {
+            transition: all 0.2s ease-in-out;
+        }
+        .sidebar-item.active { 
+            background-color: #1d1714; 
+            border-right: 4px solid #a17a5e; 
+            color: #e6dfda; 
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #231b18; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6e523e; }
+
+        /* ============================================= */
+        /* 🆕 ESTILO DO BOTÃO INSTALAR APP (NOVO) */
+        /* ============================================= */
+        #install-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: #a17a5e;
+            color: #000;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(161,122,94,0.4);
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+        #install-btn:hover { background: #e6dfda; }
+    </style>
+</head>
+<body class="text-brandText flex h-screen overflow-hidden bg-brandBg">
+
+    <aside class="w-64 bg-brandSurface text-brandTextSecondary flex flex-col border-r border-brandBorder z-50">
+        <div class="p-6 flex items-center gap-3 border-b border-brandBorder">
+            <i class="fas fa-seedling text-brandAccent text-2xl"></i>
+            <h1 class="text-lg font-bold tracking-tight text-brandText">Conilon Pro</h1>
+        </div>
+
+        <nav class="flex-grow py-6">
+            <ul class="space-y-1">
+                <li>
+                    <button onclick="showTab('tab-dashboard')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-dashboard">
+                        <i class="fas fa-chart-line w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Dashboard
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-add')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-add">
+                        <i class="fas fa-plus-circle w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Adicionar
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-harvests')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-harvests">
+                        <i class="fas fa-seedling w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Colheitas
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-history')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-history">
+                        <i class="fas fa-history w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Histórico
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-backup')" class="sidebar-item group w-full flex items-center gap-3 px-6 py-4 text-left transition-all duration-200 ease-in-out hover:bg-brandSurfaceHover hover:text-brandText active:scale-[0.98]" id="btn-backup">
+                        <i class="fas fa-database w-5 transition-transform duration-200 group-hover:translate-x-1"></i> Backup
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="p-4 text-[10px] text-center text-brandTextMuted border-t border-brandBorder bg-brandBg/30">
+            <div class="flex items-center justify-center gap-2">
+                <span>Saca padrão:</span>
+                <input type="number" id="config-saca-kg" value="61" class="bg-transparent w-10 text-center border-b border-brandBorder focus:border-brandAccent outline-none font-bold text-brandText transition-all" onchange="updateSacaWeight(this.value)">
+                <span>kg</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-grow overflow-y-auto bg-brandBg">
+        
+        <div id="tab-dashboard" class="tab-content active p-6 md:p-10">
+            <header class="mb-8 flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-bold text-brandText">Resumo do Estoque</h2>
+                    <p class="text-brandTextSecondary">Visão geral por ano</p>
+                </div>
+                <div class="flex items-center gap-2 bg-brandSurface p-2 rounded-xl border border-brandBorder">
+                    <label class="text-xs font-bold text-brandTextSecondary ml-2">FILTRAR ANO:</label>
+                    <select id="filter-year" onchange="render()" class="bg-brandSurfaceHover text-brandText border-none rounded-lg text-sm font-bold p-2 focus:ring-1 focus:ring-brandAccent outline-none cursor-pointer">
+                        <option value="ALL">Todos os Anos</option>
+                    </select>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-brandSurface p-6 rounded-2xl border border-brandBorder border-l-4 border-l-brandAccent">
+                    <p class="text-brandTextSecondary text-xs font-bold uppercase tracking-wider">Estoque Atual</p>
+                    <h2 id="total-stock-display" class="text-2xl font-bold text-brandText mt-1">--</h2>
+                    <p id="total-kg-display" class="text-xs text-brandTextMuted mt-1">Total: 0 kg</p>
+                </div>
+                <div class="bg-brandSurface p-6 rounded-2xl border border-brandBorder border-l-4 border-l-emerald-600">
+                    <p class="text-brandTextSecondary text-xs font-bold uppercase tracking-wider">Total Entradas</p>
+                    <h2 id="total-in-display" class="text-2xl font-bold text-emerald-400 mt-1">--</h2>
+                </div>
+                <div class="bg-brandSurface p-6 rounded-2xl border border-brandBorder border-l-4 border-l-rose-600">
+                    <p class="text-brandTextSecondary text-xs font-bold uppercase tracking-wider">Total Saídas</p>
+                    <h2 id="total-out-display" class="text-2xl font-bold text-rose-400 mt-1">--</h2>
+                </div>
+            </div>
+
+            <div class="bg-brandSurface rounded-2xl border border-brandBorder overflow-hidden">
+                <div class="p-6 border-b border-brandBorder flex justify-between items-center bg-brandSurfaceHover/40">
+                    <h3 class="text-lg font-bold text-brandText">Movimentações do Ano</h3>
+                    <span id="entry-count" class="bg-brandSurfaceHover text-brandTextSecondary px-3 py-1 rounded-full text-xs font-bold border border-brandBorder">0 registros</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-brandSurfaceHover/60 text-brandTextSecondary text-xs uppercase tracking-wider border-b border-brandBorder">
+                                <th class="px-6 py-4 font-semibold">Data/Hora</th>
+                                <th class="px-6 py-4 font-semibold">Tipo</th>
+                                <th class="px-6 py-4 font-semibold">Responsável</th>
+                                <th class="px-6 py-4 font-semibold text-right">Quantidade</th>
+                                <th class="px-6 py-4 font-semibold text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table" class="text-sm divide-y divide-brandBorder"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-brandSurface p-6 rounded-2xl border border-brandBorder">
+                    <h3 class="text-lg font-bold mb-4 text-brandText"><i class="fas fa-users mr-2 text-brandAccent"></i>Saldo por Pessoa</h3>
+                    <div id="person-balance-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-add" class="tab-content p-6 md:p-10">
+            <div class="max-w-xl mx-auto">
+                <h2 class="text-3xl font-bold text-brandText mb-2">Novo Lançamento</h2>
+                <p class="text-brandTextSecondary mb-8">Registre entradas e saídas de café.</p>
+                <div class="bg-brandSurface p-8 rounded-2xl border border-brandBorder">
+                    <form id="entry-form" class="space-y-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-brandTextSecondary mb-1">Tipo</label>
+                                <select id="type" class="w-full px-4 py-3 border border-brandBorder rounded-xl focus:ring-1 focus:ring-brandAccent outline-none bg-brandSurfaceHover text-brandText transition-all cursor-pointer">
+                                    <option value="IN">Entrada (+)</option>
+                                    <option value="OUT">Saída (-)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-brandTextSecondary mb-1">Ano</label>
+                                <input type="number" id="entry-year" value="2024" required class="w-full px-4 py-3 border border-brandBorder rounded-xl focus:ring-1 focus:ring-brandAccent outline-none bg-brandSurfaceHover text-brandText">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-brandTextSecondary mb-1">Responsável/Pessoa</label>
+                            <input type="text" id="person" required class="w-full px-4 py-3 border border-brandBorder rounded-xl focus:ring-1 focus:ring-brandAccent outline-none bg-brandSurfaceHover text-brandText placeholder-brandTextMuted" placeholder="Ex: João Silva">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-brandTextSecondary mb-1">Sacas</label>
+                                <input type="number" id="bags" min="0" value="0" required class="w-full px-4 py-3 border border-brandBorder rounded-xl focus:ring-1 focus:ring-brandAccent outline-none bg-brandSurfaceHover text-brandText">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-brandTextSecondary mb-1">Quilos (0-61)</label>
+                                <input type="number" id="extra-kg" min="0" max="61" value="0" required class="w-full px-4 py-3 border border-brandBorder rounded-xl focus:ring-1 focus:ring-brandAccent outline-none bg-brandSurfaceHover text-brandText">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-brandAccent text-brandBg py-4 rounded-xl font-bold hover:bg-brandText hover:text-brandBg transition-all shadow-lg mt-4">Registrar Lançamento</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-harvests" class="tab-content p-6 md:p-10">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-brandText mb-2">Colheitas</h2>
+                <p class="text-brandTextSecondary mb-8">Registro de sacos maduros por lavoura e ano.</p>
+                <div class="bg-brandSurface p-6 rounded-2xl border border-brandBorder mb-8">
+                    <form id="harvest-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div class="md:col-span-1">
+                            <label class="block text-sm font-medium text-brandTextSecondary mb-1">Nome da Lavoura</label>
+                            <input type="text" id="harvest-name" required class="w-full px-4 py-2 border border-brandBorder rounded-xl focus:ring-1 focus:ring-brandAccent outline-none bg-brandSurfaceHover text-brandText placeholder-brandTextMuted" placeholder="Ex: Lote Norte">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-brandTextSecondary mb-1">Sacos</label>
+                            <input type="number" id="harvest-bags" min="1" required class="w-full px-4 py-2 border border-brandBorder rounded-xl focus:ring-1 focus:ring-brandAccent outline-none bg-brandSurfaceHover text-brandText placeholder-brandTextMuted" placeholder="Qtd">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-brandTextSecondary mb-1">Ano</label>
+                            <input type="number" id="harvest-year" min="2000" max="2100" value="2024" required class="w-full px-4 py-2 border border-brandBorder rounded-xl focus:ring-1 focus:ring-brandAccent outline-none bg-brandSurfaceHover text-brandText">
+                        </div>
+                        <button type="submit" class="bg-brandAccent text-brandBg py-2 px-4 rounded-xl font-bold hover:bg-brandText hover:text-brandBg transition-all">Adicionar</button>
+                    </form>
+                </div>
+                <div id="harvests-container" class="space-y-6"></div>
+            </div>
+        </div>
+
+        <div id="tab-history" class="tab-content p-6 md:p-10">
+            <h2 class="text-3xl font-bold text-brandText mb-2">Histórico de Edição</h2>
+            <p class="text-brandTextSecondary mb-8">Recupere estados anteriores do seu banco de dados.</p>
+            <div class="bg-brandSurface rounded-2xl border border-brandBorder overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-brandSurfaceHover/60 text-brandTextSecondary text-xs uppercase border-b border-brandBorder">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold">Data do Snapshot</th>
+                            <th class="px-6 py-4 font-semibold">Ação Detalhada</th>
+                            <th class="px-6 py-4 font-semibold text-center">Recuperação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="undo-list" class="text-sm divide-y divide-brandBorder"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-backup" class="tab-content p-6 md:p-10">
+            <h2 class="text-3xl font-bold text-brandText mb-2">Backup & Restore</h2>
+            <p class="text-brandTextSecondary mb-8">Gerencie seus arquivos de dados para segurança total.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-brandSurface p-8 rounded-2xl border border-brandBorder text-center">
+                    <div class="w-16 h-16 bg-emerald-950/50 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl border border-emerald-800/30"><i class="fas fa-download"></i></div>
+                    <h3 class="text-xl font-bold mb-2 text-brandText">Exportar Dados</h3>
+                    <p class="text-brandTextSecondary text-sm mb-6">Baixe um arquivo .json com todos os seus registros antigos.</p>
+                    <button onclick="exportJSON()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition-all">Baixar Arquivo JSON</button>    
+                </div>
+                <div class="bg-brandSurface p-8 rounded-2xl border border-brandBorder text-center">
+                    <div class="w-16 h-16 bg-brandSurfaceHover text-brandAccent rounded-full flex items-center justify-center mx-auto mb-4 text-2xl border border-brandBorder"><i class="fas fa-upload"></i></div>
+                    <h3 class="text-xl font-bold mb-2 text-brandText">Importar Dados</h3>
+                    <p class="text-brandTextSecondary text-sm mb-6">Substitua o estoque atual por um arquivo .json salvo anteriormente.</p>
+                    <label class="w-full bg-brandAccent text-brandBg py-3 rounded-xl font-bold hover:bg-brandText hover:text-brandBg transition-all cursor-pointer block">
+                        Escolher Arquivo <input type="file" id="import-file" class="hidden" accept=".json" onchange="importJSON(event)">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ============================================= -->
+    <!-- 🆕 BOTÃO INSTALAR APP (NOVO) -->
+    <!-- ============================================= -->
+    <button id="install-btn">
+        <i class="fas fa-download mr-2"></i> Instalar App
+    </button>
+
+    <script>
+        let state = {
+            entries: JSON.parse(localStorage.getItem('conilon_stock_data')) || [],
+            history: JSON.parse(localStorage.getItem('conilon_history')) || [],
+            harvests: JSON.parse(localStorage.getItem('conilon_harvests')) || [],
+            configSaca: parseInt(localStorage.getItem('conilon_config_saca')) || 61
+        };
+
+        const saveState = (actionName, details = "") => {
+            const snapshot = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                action: actionName,
+                details: details,
+                data: JSON.parse(JSON.stringify({ entries: state.entries, harvests: state.harvests, configSaca: state.configSaca })) 
+            };
+            state.history.unshift(snapshot);
+            if(state.history.length > 20) state.history.pop();
+            localStorage.setItem('conilon_stock_data', JSON.stringify(state.entries));
+            localStorage.setItem('conilon_harvests', JSON.stringify(state.harvests));
+            localStorage.setItem('conilon_history', JSON.stringify(state.history));
+            localStorage.setItem('conilon_config_saca', state.configSaca);
+            render();
+        };
+
+        const updateSacaWeight = (val) => {
+            const newVal = parseInt(val);
+            if(!newVal || newVal <= 0) return;
+            state.configSaca = newVal;
+            saveState("Alteração de Saca", `Saca alterada para ${newVal} kg`);
+            document.getElementById('config-saca-kg').value = newVal;
+        };
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            const btnId = 'btn-' + tabId.replace('tab-', '');
+            if(document.getElementById(btnId)) document.getElementById(btnId).classList.add('active');
+        }
+
+        const formatWeight = (totalKg) => {
+            const absKg = Math.abs(Math.round(totalKg));
+            const bags = Math.floor(absKg / state.configSaca);
+            const kg = absKg % state.configSaca;
+            return `${bags} sacas e ${kg} kg`;
+        };
+
+        document.getElementById('entry-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const type = document.getElementById('type').value;
+            const person = document.getElementById('person').value.trim();
+            const bags = parseInt(document.getElementById('bags').value);
+            const extraKg = parseInt(document.getElementById('extra-kg').value);
+            const year = parseInt(document.getElementById('entry-year').value);
+            const totalWeightInKg = (bags * state.configSaca) + extraKg;
+
+            if(!person || isNaN(totalWeightInKg)) return;
+
+            state.entries.unshift({
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                type, person, bags, extraKg, year,
+                totalWeightInKg: type === 'IN' ? totalWeightInKg : -totalWeightInKg
+            });
+
+            saveState("Novo Lançamento", `${type === 'IN' ? '+' : '-'}${bags} sacas e ${extraKg}kg para ${person} em ${year}`);
+            e.target.reset();
+            document.getElementById('entry-year').value = new Date().getFullYear();
+        });
+
+        const deleteEntry = (id) => {
+            if(confirm("Deseja excluir este registro?")) {
+                state.entries = state.entries.filter(e => e.id !== id);
+                saveState("Exclusão de Registro", `Removido um item do estoque`);
+            }
+        };
+
+        document.getElementById('harvest-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('harvest-name').value.trim();
+            const bagsVal = parseInt(document.getElementById('harvest-bags').value);
+            const year = parseInt(document.getElementById('harvest-year').value);
+
+            state.harvests.push({ id: Date.now(), name, bags: bagsVal, year });
+            saveState("Nova Colheita", `Lavoura: ${name} | Qtd: ${bagsVal} sacos`);
+            e.target.reset();
+            document.getElementById('harvest-year').value = new Date().getFullYear();
+        });
+
+        const deleteHarvest = (id) => {
+            if(confirm("Excluir esta colheita?")) {
+                state.harvests = state.harvests.filter(h => h.id !== id);
+                saveState("Remover Colheita", `Lavoura removida`);
+            }
+        };
+
+        const restoreSnapshot = (snapshotId) => {
+            const snapshot = state.history.find(h => h.id === snapshotId);
+            if(!snapshot || !confirm("Restaurar este estado?")) return;
+            state.entries = snapshot.data.entries;
+            state.harvests = snapshot.data.harvests;
+            state.configSaca = snapshot.data.configSaca;
+            localStorage.setItem('conilon_stock_data', JSON.stringify(state.entries));
+            localStorage.setItem('conilon_harvests', JSON.stringify(state.harvests));
+            localStorage.setItem('conilon_config_saca', state.configSaca);
+            render();
+        };
+
+        const exportJSON = () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+                entries: state.entries, harvests: state.harvests, configSaca: state.configSaca
+            }));
+            const anchor = document.createElement('a');
+            anchor.setAttribute("href", dataStr);
+            anchor.setAttribute("download", `conilon_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+        };
+
+        const importJSON = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    state.entries = imported.entries || [];
+                    state.harvests = imported.harvests || [];
+                    state.configSaca = imported.configSaca || 61;
+                    localStorage.setItem('conilon_stock_data', JSON.stringify(state.entries));
+                    localStorage.setItem('conilon_harvests', JSON.stringify(state.harvests));
+                    localStorage.setItem('conilon_config_saca', state.configSaca);
+                    render();
+                } catch (err) { alert("Erro no arquivo."); }
+            };
+            reader.readAsText(file);
+        };
+
+        const render = () => {
+            updateYearFilter();
+            renderHistory();
+            renderSummary();
+            renderPersonBalances();
+            renderUndoList();
+            renderHarvests();
+            document.getElementById('config-saca-kg').value = state.configSaca;
+        };
+
+        const updateYearFilter = () => {
+            const filter = document.getElementById('filter-year');
+            const currentVal = filter.value;
+            const years = [...new Set(state.entries.map(e => e.year))].sort((a, b) => b - a);
+            
+            let html = '<option value="ALL">Todos os Anos</option>';
+            years.forEach(y => {
+                html += `<option value="${y}" ${currentVal == y ? 'selected' : ''}>Ano ${y}</option>`;
+            });
+            filter.innerHTML = html;
+        };
+
+        const renderHarvests = () => {
+            const container = document.getElementById('harvests-container');
+            container.innerHTML = '';
+            const grouped = state.harvests.reduce((acc, curr) => {
+                if (!acc[curr.year]) acc[curr.year] = [];
+                acc[curr.year].push(curr);
+                return acc;
+            }, {});
+
+            const years = Object.keys(grouped).sort((a, b) => b - a);
+            years.forEach(year => {
+                const yearDiv = document.createElement('div');
+                yearDiv.className = "bg-brandSurface rounded-2xl border border-brandBorder overflow-hidden mb-6";
+                let rowsHtml = '';
+                let totalYearBags = 0;
+
+                grouped[year].forEach(h => {
+                    totalYearBags += h.bags;
+                    rowsHtml += `
+                        <tr class="border-b border-brandBorder hover:bg-brandSurfaceHover/30 transition-colors">
+                            <td class="px-6 py-4 text-brandText font-medium">${h.name}</td>
+                            <td class="px-6 py-4 text-brandAccent font-bold">${h.bags} sacos</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="deleteHarvest(${h.id})" class="text-brandTextMuted hover:text-rose-400 transition-colors"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                });
+
+                yearDiv.innerHTML = `
+                    <div class="bg-brandSurfaceHover text-brandText px-6 py-4 flex justify-between items-center border-b border-brandBorder">
+                        <h4 class="font-bold"><i class="fas fa-calendar-alt mr-2 text-brandAccent"></i> Colheita ${year}</h4>
+                        <span class="text-xs bg-brandAccent text-brandBg px-2 py-1 rounded font-bold">Total: ${totalYearBags} sacos</span>
+                    </div>
+                    <table class="w-full text-left border-collapse"><tbody id="year-${year}">${rowsHtml}</tbody></table>`;
+                container.appendChild(yearDiv);
+            });
+        };
+
+        const renderSummary = () => {
+            const filterYear = document.getElementById('filter-year').value;
+            let totalInKg = 0, totalOutKg = 0, currentStockKg = 0;
+            let count = 0;
+
+            state.entries.forEach(e => {
+                if (filterYear === 'ALL' || e.year == filterYear) {
+                    count++;
+                    if(e.type === 'IN') totalInKg += Math.abs(e.totalWeightInKg);
+                    else totalOutKg += Math.abs(e.totalWeightInKg);
+                }
+            });
+
+            currentStockKg = totalInKg - totalOutKg;
+            document.getElementById('total-stock-display').innerText = formatWeight(currentStockKg);
+            document.getElementById('total-kg-display').innerText = `Total: ${Math.abs(currentStockKg).toFixed(0)} kg`;
+            document.getElementById('total-in-display').innerText = formatWeight(totalInKg);
+            document.getElementById('total-out-display').innerText = formatWeight(totalOutKg);
+            document.getElementById('entry-count').innerText = `${count} registros`;
+
+            const table = document.getElementById('history-table');
+            table.innerHTML = '';
+            state.entries.filter(e => filterYear === 'ALL' || e.year == filterYear).forEach(entry => {
+                const date = new Date(entry.timestamp).toLocaleString('pt-BR', { 
+                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+                });
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-brandSurfaceHover transition-colors border-b border-brandBorder";
+                
+                const typeClass = entry.type === 'IN' 
+                    ? 'text-emerald-400 bg-emerald-950/40 border border-emerald-800/30 px-2 py-1 rounded text-xs font-bold' 
+                    : 'text-rose-400 bg-rose-950/40 border border-rose-800/30 px-2 py-1 rounded text-xs font-bold';
+                
+                const displayQty = `${entry.bags} sacas e ${entry.extraKg} kg`;
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 text-brandTextSecondary">${date}</td>
+                    <td class="px-6 py-4"><span class="${typeClass}">${entry.type === 'IN' ? 'ENTRADA' : 'SAÍDA'}</span></td>
+                    <td class="px-6 py-4 font-medium text-brandText">${entry.person} <br><small class="text-[10px] text-brandTextSecondary">${displayQty}</small></td>
+                    <td class="px-6 py-4 text-right font-bold ${entry.type === 'IN' ? 'text-emerald-400' : 'text-rose-400'}">${entry.type === 'IN' ? '+' : '-'}${displayQty}</td>
+                    <td class="px-6 py-4 text-center"><button onclick="deleteEntry(${entry.id})" class="text-brandTextMuted hover:text-rose-400 transition-colors"><i class="fas fa-trash-alt"></i></button></td>
+                `;
+                table.appendChild(tr);
+            });
+        };
+
+        const renderPersonBalances = () => {
+            const balances = {};
+            state.entries.forEach(e => {
+                if(!balances[e.person]) balances[e.person] = 0;
+                balances[e.person] += e.totalWeightInKg;
+            });
+
+            const list = document.getElementById('person-balance-list');
+            list.innerHTML = '';
+            const people = Object.keys(balances);
+            if(people.length === 0) {
+                list.innerHTML = `<p class="text-brandTextMuted text-sm italic text-center py-4">Nenhum dado encontrado.</p>`;
+                return;
+            }
+
+            people.sort((a, b) => balances[b] - balances[a]);
+            people.forEach(person => {
+                const weight = balances[person];
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-4 rounded-xl bg-brandSurfaceHover/40 border border-brandBorder";
+                const isPos = weight >= 0;
+                div.innerHTML = `
+                    <div>
+                        <p class="font-bold text-brandText">${person}</p>
+                        <p class="text-[10px] uppercase font-bold ${isPos ? 'text-emerald-400' : 'text-rose-400'}">${isPos ? 'Saldo Positivo' : 'Saldo Negativo'}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold ${isPos ? 'text-emerald-400' : 'text-rose-400'}">${formatWeight(weight)}</p>
+                        <p class="text-[10px] text-brandTextSecondary">${Math.abs(weight).toFixed(0)} kg</p>
+                    </div>`;
+                list.appendChild(div);
+            });
+        };
+
+        const renderHistory = () => {
+            const undoList = document.getElementById('undo-list');
+            undoList.innerHTML = '';
+            if(state.history.length === 0) {
+                undoList.innerHTML = `<tr><td colspan="3" class="px-6 py-12 text-center text-brandTextMuted italic">Nenhum histórico disponível</td></tr>`;
+                return;
+            }
+
+            state.history.forEach(snap => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-brandBorder hover:bg-brandSurfaceHover/30 transition-colors";
+                const date = new Date(snap.timestamp).toLocaleString('pt-BR');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 text-brandTextSecondary">${date}</td>
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-brandAccent">${snap.action}</div>
+                        <div class="text-[11px] text-brandTextSecondary leading-tight mt-1">${snap.details || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="restoreSnapshot(${snap.id})" class="bg-brandSurfaceHover hover:bg-brandAccent text-brandText hover:text-brandBg px-3 py-1.5 rounded-lg transition-all text-xs font-bold border border-brandBorder">Restaurar</button>
+                    </td>
+                `;
+                undoList.appendChild(tr);
+            });
+        };
+
+        const renderUndoList = () => {};
+
+        document.getElementById('entry-year').value = new Date().getFullYear();
+        document.getElementById('harvest-year').value = new Date().getFullYear();
+        showTab('tab-dashboard');
+        render();
+
+        // =============================================
+        // 🆕 REGISTRO DO SERVICE WORKER (NOVO)
+        // =============================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('✅ SW registrado:', reg.scope))
+                    .catch(err => console.error('❌ Falha no SW:', err));
+            });
+        }
+
+        // =============================================
+        // 🆕 BOTÃO INSTALAR APP (NOVO)
+        // =============================================
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`Usuário escolheu: ${outcome}`);
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt = null;
+        });
+    </script>
+</body>
+</html>
