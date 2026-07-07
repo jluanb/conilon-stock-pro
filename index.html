@@ -651,6 +651,32 @@
             installBtn.style.display = 'none';
             deferredPrompt = null;
         });
+
+        // =============================================
+        //  SCRIPT DE ATALHOS (SHORTCUTS)
+        // =============================================
+        // Detecta se a URL termina com #add ou #harvests (usado pelos atalhos do PWA)
+        // e abre a aba correspondente automaticamente.
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash === 'add') {
+                showTab('tab-add');
+            } else if (hash === 'harvests') {
+                showTab('tab-harvests');
+            }
+        });
+
+        // Atualiza a aba se o usuário mudar o hash manualmente
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash === 'add') {
+                showTab('tab-add');
+            } else if (hash === 'harvests') {
+                showTab('tab-harvests');
+            } else if (hash === '') {
+                showTab('tab-dashboard');
+            }
+        });
     </script>
 </body>
 </html>
