@@ -24,5 +24,22 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Novo Lançamento",
+      "short_name": "Adicionar",
+      "description": "Registrar entrada ou saída de café",
+      "url": "./index.html#add",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ver Colheitas",
+      "short_name": "Colheitas",
+      "description": "Visualizar colheitas registradas",
+      "url": "./index.html#harvests",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    }
   ]
 }
